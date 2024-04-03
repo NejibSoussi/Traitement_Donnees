@@ -14,7 +14,7 @@ pip install plotly
 ```
 
 ## Utilisation
-#Chargement du fichier CSV
+# Chargement du fichier CSV
 Lorsque vous lancez l'application, une boîte de dialogue de sélection de fichier apparaîtra automatiquement. Sélectionnez le fichier CSV contenant vos données.
 
 # Sélection des colonnes
