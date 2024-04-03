@@ -7,34 +7,34 @@ import webbrowser
 from tkinter import filedialog
 import os
 
-# Créer une application web Dash
+# Create a Dash web application
 app = dash.Dash(__name__)
 
-# Charger le fichier CSV directement sans demander à l'utilisateur
-csv_file_path = filedialog.askopenfilename(title="Sélectionner le fichier CSV", filetypes=[("Fichiers CSV", "*.csv")])
+# Load the CSV file directly without prompting the user
+csv_file_path = filedialog.askopenfilename(title="Select the CSV file", filetypes=[("CSV Files", "*.csv")])
 
-# Si aucun fichier sélectionné, arrêter le code
+# If no file selected, stop the code
 if not csv_file_path or not os.path.isfile(csv_file_path):
-    print("Aucun fichier CSV valide sélectionné. Action terminée.")
+    print("No valid CSV file selected. Action terminated.")
     exit()
 
-# Charger le CSV dans le DataFrame
+# Load the CSV into the DataFrame
 df = pd.read_csv(csv_file_path)
 
-# Définir la mise en page
+# Define the layout
 app.layout = html.Div([
     dcc.Dropdown(
         id='graph-type-dropdown',
         options=[
-            {'label': 'Nuage de points', 'value': 'scatter'},
-            {'label': 'Histogramme', 'value': 'histogram'},
-            {'label': 'Histogramme Empilé', 'value': 'stacked_histogram'},
+            {'label': 'Scatter Plot', 'value': 'scatter'},
+            {'label': 'Histogram', 'value': 'histogram'},
+            {'label': 'Stacked Histogram', 'value': 'stacked_histogram'},
             {'label': 'Line Chart', 'value': 'line'},
             {'label': 'Box Plot', 'value': 'box'},
             {'label': 'Violin Plot', 'value': 'violin'},
             {'label': '3D Scatter Plot', 'value': 'scatter_3d'},
-            {'label': 'Graphique Circulaire', 'value': 'pie'},
-            {'label': 'Graphique Donut', 'value': 'donut'}
+            {'label': 'Pie Chart', 'value': 'pie'},
+            {'label': 'Donut Chart', 'value': 'donut'}
         ],
         value='scatter',
         style={'width': '50%'}
@@ -65,21 +65,21 @@ app.layout = html.Div([
         id='filter-column-dropdown',
         options=[{'label': col, 'value': col} for col in df.columns],
         multi=True,
-        placeholder="Sélectionner les colonnes de filtre",
+        placeholder="Select filter columns",
         style={'width': '50%'}
     ),
 
     dcc.Dropdown(
         id='filter-data-dropdown',
         multi=True,
-        placeholder="Sélectionner les données de filtre",
+        placeholder="Select filter data",
         style={'width': '50%'}
     ),
 
     dcc.Graph(id='graph-output')
 ])
 
-# Callback pour mettre à jour les options de données de filtre en fonction des colonnes de filtre sélectionnées
+# Callback to update filter data options based on selected filter columns
 @app.callback(
     Output('filter-data-dropdown', 'options'),
     [Input('filter-column-dropdown', 'value')]
@@ -91,7 +91,7 @@ def update_filter_data_dropdown(selected_columns):
     options = [{'label': str(val), 'value': val} for col in selected_columns for val in df[col].dropna().unique()]
     return options
 
-# Callback pour réinitialiser les données de filtre sélectionnées lorsque les colonnes de filtre sont modifiées
+# Callback to reset selected filter data when filter columns are changed
 @app.callback(
     Output('filter-data-dropdown', 'value'),
     [Input('filter-column-dropdown', 'options')]
@@ -99,7 +99,7 @@ def update_filter_data_dropdown(selected_columns):
 def reset_filter_data_dropdown(_):
     return []
 
-# Callback pour mettre à jour le graphique en fonction des sélections de l'utilisateur et des filtres
+# Callback to update the graph based on user selections and filters
 @app.callback(
     Output('graph-output', 'figure'),
     [Input('graph-type-dropdown', 'value'),
@@ -112,11 +112,11 @@ def reset_filter_data_dropdown(_):
 def update_graph(graph_type, selected_variable_x, selected_variable_secondary_x, selected_variable_third_x, filter_columns, filter_data):
     filtered_df = df.copy()
 
-    # Appliquer des filtres en fonction des colonnes sélectionnées
+    # Apply filters based on selected columns
     if filter_columns and filter_data:
         for col, values in zip(filter_columns, [filter_data] if isinstance(filter_data, str) else [filter_data]):
             if col in filtered_df.columns:
-                # Utiliser .isin() pour filtrer le DataFrame en fonction de plusieurs valeurs pour la même colonne
+                # Use .isin() to filter the DataFrame based on multiple values for the same column
                 filtered_df = filtered_df[filtered_df[col].isin(values)]
 
     if graph_type == 'scatter' and selected_variable_x and selected_variable_secondary_x:
@@ -125,59 +125,59 @@ def update_graph(graph_type, selected_variable_x, selected_variable_secondary_x,
     elif graph_type == 'histogram' and selected_variable_x:
         selected_variables = [v for v in [selected_variable_x, selected_variable_secondary_x, selected_variable_third_x] if v is not None]
 
-        # Générer dynamiquement la séquence de couleurs pour chaque variable sélectionnée
+        # Dynamically generate color sequence for each selected variable
         color_sequence = px.colors.qualitative.Set1[:len(selected_variables)-1]
 
-        # Créer un dictionnaire spécifiant la couleur pour chaque variable
+        # Create a dictionary specifying color for each variable
         color_mapping = {var: color for var, color in zip(selected_variables[1:], color_sequence)}
 
-        # Créer des sous-graphiques le long de l'axe des x pour les variables supplémentaires
+        # Create subplots along the x-axis for additional variables
         fig = px.histogram(filtered_df, x=selected_variable_x, color=selected_variable_secondary_x, facet_col=selected_variable_third_x,
-                        title=f"Histogramme avec {', '.join(selected_variables[1:])} subdivisions",
+                        title=f"Histogram with {', '.join(selected_variables[1:])} subdivisions",
                         color_discrete_map=color_mapping)
         return fig
     elif graph_type == 'stacked_histogram' and selected_variable_x and selected_variable_secondary_x:
 
-        # Filtrer les données pour la troisième variable x si elle est présente
+        # Filter data for third x-variable if present
         if selected_variable_third_x:
             grouped_df = filtered_df.groupby([selected_variable_x, selected_variable_third_x, selected_variable_secondary_x]).size().reset_index(name='Count')
 
-            # Calculer la somme pour chaque valeur de la variable x
+            # Calculate sum for each x-value
             grouped_df['Total'] = grouped_df.groupby([selected_variable_x, selected_variable_third_x])['Count'].transform('sum')
 
-            # Calculer le pourcentage
+            # Calculate percentage
             grouped_df['Percentage'] = grouped_df['Count'] / grouped_df['Total'] * 100
 
             fig = px.bar(grouped_df, x=selected_variable_x, y='Percentage', color=selected_variable_secondary_x, facet_col=selected_variable_third_x,
-                        labels={selected_variable_x: selected_variable_x, 'Percentage': 'Pourcentage (%)'},
-                        title=f"{selected_variable_x} avec {selected_variable_secondary_x} subdivisions (Colonnes empilées à 100%)")
+                        labels={selected_variable_x: selected_variable_x, 'Percentage': 'Percentage (%)'},
+                        title=f"{selected_variable_x} with {selected_variable_secondary_x} subdivisions (Stacked Columns at 100%)")
 
             return fig
         else:
-            # Si aucune troisième variable x n'est sélectionnée
+            # If no third x-variable selected
             if selected_variable_secondary_x:
                 grouped_df = filtered_df.groupby([selected_variable_x, selected_variable_secondary_x]).size().reset_index(name='Count')
             else:
-                # Si seulement une variable x est sélectionnée, calculer le nombre d'occurrences
+                # If only one x-variable selected, calculate occurrences
                 grouped_df = filtered_df.groupby(selected_variable_x).size().reset_index(name='Count')
 
-            # Calculer la somme pour chaque valeur de la variable x
+            # Calculate sum for each x-value
             grouped_df['Total'] = grouped_df.groupby(selected_variable_x)['Count'].transform('sum')
 
-            # Calculer le pourcentage
+            # Calculate percentage
             grouped_df['Percentage'] = grouped_df['Count'] / grouped_df['Total'] * 100
 
-            # Si deux variables sont sélectionnées, utiliser un graphique empilé à 100%
+            # If two variables selected, use stacked bar chart at 100%
             fig = px.bar(grouped_df, x=selected_variable_x, y='Percentage', color=selected_variable_secondary_x,
-                        labels={selected_variable_x: selected_variable_x, 'Percentage': 'Pourcentage (%)'},
-                        title=f"{selected_variable_x} avec {selected_variable_secondary_x} subdivisions (Colonnes empilées à 100%)")
+                        labels={selected_variable_x: selected_variable_x, 'Percentage': 'Percentage (%)'},
+                        title=f"{selected_variable_x} with {selected_variable_secondary_x} subdivisions (Stacked Columns at 100%)")
 
             return fig
     elif graph_type == 'pie' and selected_variable_x:
-        fig = px.pie(filtered_df, names=selected_variable_x, title=f"Graphique Circulaire de {selected_variable_x}")
+        fig = px.pie(filtered_df, names=selected_variable_x, title=f"Pie Chart of {selected_variable_x}")
         return fig
     elif graph_type == 'donut' and selected_variable_x:
-        fig = px.pie(filtered_df, names=selected_variable_x, title=f"Graphique Donut de {selected_variable_x}", hole=0.3)
+        fig = px.pie(filtered_df, names=selected_variable_x, title=f"Donut Chart of {selected_variable_x}", hole=0.3)
         return fig
     elif graph_type == 'line' and selected_variable_x and selected_variable_secondary_x:
         fig = px.line(filtered_df, x=selected_variable_x, y=selected_variable_secondary_x, title=f"{selected_variable_x} vs {selected_variable_secondary_x}")
@@ -194,6 +194,6 @@ def update_graph(graph_type, selected_variable_x, selected_variable_secondary_x,
     else:
         return px.scatter()
 
-# Exécuter l'application Dash
+# Run the Dash application
 webbrowser.open('http://127.0.0.1:8050/')
 app.run_server(debug=True)
