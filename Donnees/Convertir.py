@@ -4,52 +4,52 @@ import tkinter as tk
 from tkinter import filedialog
 import os
 
-# Créé le tkinter
+# Create the tkinter window
 root = tk.Tk()
 root.withdraw()
 
-### Étape 1 : Demander à l'utilisateur de sélectionner un fichier csv
-csv_file_path = filedialog.askopenfilename(title="Sélectionner le fichier CSV", filetypes=[("CSV files", "*.csv")])
+### Step 1: Ask the user to select a csv file
+csv_file_path = filedialog.askopenfilename(title="Select the CSV file", filetypes=[("CSV files", "*.csv")])
 
-# Si asucun fichier sélectionné, arrêter le code
+# If no file selected, stop the code
 if not csv_file_path:
-    print("Aucun fichier sélectionné. Action terminée.")
+    print("No file selected. Action terminated.")
     exit()
 
-# Charger le CSV dans le DataFrame de pandas
+# Load the CSV into pandas DataFrame
 df = pd.read_csv(csv_file_path)
 
-### Étape 2 : Aller chercher la colonne contemant les données en format json
-json_column_name = 'Champs personnalises'
+### Step 2: Get the column containing data in JSON format
+json_column_name = 'Custom Fields'
 
-# Valider que le nom de la colonne existe dans le DataFram pandas
+# Validate that the column name exists in the pandas DataFrame
 if json_column_name not in df.columns:
     print(f"Column '{json_column_name}' not found in the DataFrame. Exiting.")
     exit()
 
-### Étape 3 : Convertir la représentation sous forme de chaîne de la liste de dictionnaires en une liste réelle
+### Step 3: Convert the string representation of list of dictionaries into actual list
 df[json_column_name] = df[json_column_name].apply(lambda x: ast.literal_eval(x) if pd.notna(x) else [])
 
-### Étape 4 : Éclater la liste des dictionnaires en lignes distinctes
+### Step 4: Explode the list of dictionaries into separate rows
 df_exploded = df.explode(json_column_name)
 
-### Étape 5 : Extraire les « valeurs » et le « nom » dans des colonnes séparées
+### Step 5: Extract 'values' and 'name' into separate columns
 df_exploded['values'] = df_exploded[json_column_name].apply(lambda x: x['values'][0] if x and 'values' in x else '')
 df_exploded['name'] = df_exploded[json_column_name].apply(lambda x: x['name'] if x and 'name' in x else '')
 
-### Étape 6 : Faire pivoter le DataFrame pour obtenir le résultat souhaité
+### Step 6: Pivot the DataFrame to get the desired result
 df_pivoted = df_exploded.pivot_table(index=df_exploded.index, columns='name', values='values', aggfunc='first')
 
-### Étape 7 : Concaténer le DataFrame pivoté avec le DataFrame d'origine
+### Step 7: Concatenate the pivoted DataFrame with the original DataFrame
 df_fixed = pd.concat([df, df_pivoted], axis=1)
 
-### Étape 8 : Supprimer la colonne d'origine de type JSON
+### Step 8: Remove the original JSON type column
 df_fixed = df_fixed.drop(columns=[json_column_name])
 
-### Étape 9 : Enregistrer le DataFrame fixed dans un nouveau fichier CSV
+### Step 9: Save the fixed DataFrame to a new CSV file
 output_csv_path = 'Modified_' + os.path.basename(csv_file_path)
 output_full_path = os.path.join(os.path.dirname(csv_file_path), output_csv_path)
 df_fixed.to_csv(output_full_path, index=False)
 
-# Imprimer le chemin complet du fichier CSV corrigé
-print(f"Le fichier modifié a été enregistré ici : {output_full_path}")
+# Print the full path of the fixed CSV file
+print(f"The modified file has been saved here: {output_full_path}")
