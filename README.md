@@ -48,6 +48,6 @@ To reset the selected filters, simply uncheck all selected options in the filter
 > [!NOTE]
 > An additional code is provided to transform string json data into columns.
 > 
-> [Convertir.py](./Convertir.py)
+> [Convertir.py](./Donnees/Convertir.py)
 > 
 > This will create a new CSV file with the corrected data, called Modified_X, where X is the original file name.
