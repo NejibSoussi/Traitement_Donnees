@@ -38,6 +38,7 @@ Use the dropdown menu to select the type of graph you want to display. Available
 
 ## Displaying the Graph
 Once you've selected the desired options, the corresponding graph will be automatically generated and displayed in the output area.
+[Final.png](./Archives/Final.png)
 
 ## Interactivity
 You can interact with the graph using Plotly's native features. For example, zooming, scrolling, hovering for detailed information, etc.
