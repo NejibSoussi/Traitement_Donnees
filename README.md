@@ -14,7 +14,7 @@ pip install pandas
 pip install plotly
 ```
 
-### Usage
+# Usage
 ## Loading the CSV File
 When you launch the application, a file selection dialog will automatically appear. Select the CSV file containing your data.
 
