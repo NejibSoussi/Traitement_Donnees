@@ -47,7 +47,7 @@ df_fixed = pd.concat([df, df_pivoted], axis=1)
 df_fixed = df_fixed.drop(columns=[json_column_name])
 
 ### Étape 9 : Enregistrer le DataFrame fixed dans un nouveau fichier CSV
-output_csv_path = 'Modifié_' + os.path.basename(csv_file_path)
+output_csv_path = 'Modified_' + os.path.basename(csv_file_path)
 output_full_path = os.path.join(os.path.dirname(csv_file_path), output_csv_path)
 df_fixed.to_csv(output_full_path, index=False)
 
