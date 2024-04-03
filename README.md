@@ -7,9 +7,11 @@ Cette application Dash a été développée pour permettre aux utilisateurs d'ex
 ## Prérequis
 Avant d'utiliser cette application, assurez-vous d'avoir installé Python ainsi que les bibliothèques requises. Vous pouvez installer les dépendances en exécutant les commandes suivantes :
 
+```bash
 pip install dash 
 pip install pandas 
 pip install plotly
+```
 
 ## Utilisation
 #Chargement du fichier CSV
