@@ -18,11 +18,7 @@ pip install plotly
 ## Loading the CSV File
 When you launch the application, a file selection dialog will automatically appear. Select the CSV file containing your data.
 
-## Column Selection
-Once the file is loaded, you'll see a dropdown list allowing you to select the column to use as the x-axis for the graph.
-
-## Filter Selection
-Use the filter column dropdown menus to select the columns on which you want to filter the data. After selecting a filter column, a dropdown list of the unique values available in that column will appear. You can select one or more values to filter the data.
+![SelectFile.png](./Archives/SelectFile.png)
 
 ## Graph Type Selection
 Use the dropdown menu to select the type of graph you want to display. Available options include: 
@@ -36,8 +32,25 @@ Use the dropdown menu to select the type of graph you want to display. Available
 - Pie Chart
 - Donut Chart
 
+![GraphSelection.png](./Archives/GraphSelection.png)
+
+## Column Selection
+Once the file is loaded, you'll see a dropdown list allowing you to select the column to use as the x and y axis for the graph. You can also add a third variable.
+
+![AxisSelection.png](./Archives/AxisSelection.png)
+
+## Filter Selection
+Use the filter column dropdown menus to select the columns on which you want to filter the data.
+
+![SelectFilter.png](./Archives/SelectFilter.png)
+
+After selecting a filter column, a dropdown list of the unique values available in that column will appear. You can select one or more values to filter the data.
+
+![SelectFilterType.png](./Archives/SelectFilterType.png)
+
 ## Displaying the Graph
 Once you've selected the desired options, the corresponding graph will be automatically generated and displayed in the output area.
+
 ![Final.png](./Archives/Final.png)
 
 ## Interactivity
